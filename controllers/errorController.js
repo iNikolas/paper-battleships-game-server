@@ -1,11 +1,13 @@
+class ServerError extends Error {
+    constructor(detail, status, name) {
+        super(detail);
+        this.name = name;
+        this.status = status;
+    }
+}
+
 module.exports = {
-    ServerError: class ServerError extends Error {
-        constructor(detail, status, name) {
-            super(detail);
-            this.name = name;
-            this.status = status;
-        }
-    },
+    ServerError,
     internalServerError: async (error, req, res, next) => {
         console.error(`ERROR occurred ${new Date()}: ${error.message}`);
         const status = error.status || 500;
@@ -26,13 +28,13 @@ module.exports = {
             const contentType = req.headers["content-type"];
             const accept = req.headers["accept"];
             if (req.body.data && contentType !== "application/vnd.api+json")
-                throw new this.ServerError(
+                throw new ServerError(
                     "The media format of the requested data is not supported by the server, so the server is rejecting the request.",
                     415,
                     "Unsupported Media Type"
                 );
             if (accept && accept !== "application/vnd.api+json")
-                throw new this.ServerError(
+                throw new ServerError(
                     "Given header accept type is not supported by the server",
                     406,
                     "Not Acceptable"
