@@ -75,10 +75,10 @@ webSocketServer.on('connection', async (ws) => {
 server.on('upgrade', (req, socket, head) => {
     const {accessToken: token} = parseCookie(req.headers.cookie)
 
-    if (!token) refuseSocketConnection(socket)
+    if (!token) return refuseSocketConnection(socket)
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err) refuseSocketConnection(socket)
+        if (err) return refuseSocketConnection(socket)
         socket.user = user
         updateRedisSet('online', user.name)
     })
