@@ -16,11 +16,17 @@ const express = require("express"),
     refuseSocketConnection = require("./controllers/helpers/authFunctions/refuseSocketConnection"),
     broadcastMessage = require("./controllers/helpers/websocket/broadcastMessage"),
     {refreshRedisSet, updateRedisSet, updateRedisList, getRedisSet, getRedisList} = require("./db/redis/redis"),
-    parseMessage = require("./controllers/helpers/websocket/parseMassage");
+    parseMessage = require("./controllers/helpers/websocket/parseMassage"),
+    isProduction = process.env.NODE_ENV === "production";
 
 app.use('/', router)
 
-router.use(cors({origin: "http://localhost:3000", credentials: true}))
+router.use(cors({
+    origin: isProduction
+        ? "https://inikolas.github.io"
+        : "http://localhost:3000",
+    credentials: true,
+}))
     .use(cookieParser())
     .use(bodyParser.json({type: "application/vnd.api+json"}))
     .use(mediaTypeError)
